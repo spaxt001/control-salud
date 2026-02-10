@@ -3,196 +3,238 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SaludPro V3</title>
+    <title>SaludPro V9</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            -webkit-tap-highlight-color: transparent;
+            background-color: #f8fafc;
+        }
+
+        /* Configuración del Fondo con la Imagen Proporcionada */
+        .app-bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-image: url('1000010657.png'); /* Nombre del archivo subido */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            opacity: 0.15; /* Opacidad baja para no interferir con la lectura */
+        }
+
+        /* Estilo de Cristal para los contenedores */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: slideUp 0.3s ease-out; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .chart-container { position: relative; height: 300px; width: 100%; }
-        .active-filter { background-color: #4f46e5; color: white; }
-        /* Modal Style */
+        
+        .chart-container { position: relative; height: 380px; width: 100%; }
+        .active-filter { background-color: #4f46e5; color: white; border-color: #4f46e5; shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        .sub-tab-active { border-bottom: 3px solid #4f46e5; color: #4f46e5; }
+        
         #exportModal { display: none; }
         #exportModal.active { display: flex; }
+
+        input, select { background: rgba(255, 255, 255, 0.9) !important; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900 pb-24">
+<body class="pb-24">
 
-    <!-- Header Fijo -->
-    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b px-6 py-4 flex justify-between items-center shadow-sm">
+    <!-- Capa de Fondo Fijo -->
+    <div class="app-bg-overlay"></div>
+
+    <!-- Encabezado -->
+    <header class="bg-white/70 backdrop-blur-md sticky top-0 z-50 border-b px-6 py-4 flex justify-between items-center shadow-sm">
         <div class="flex items-center gap-2">
             <div class="bg-indigo-600 p-2 rounded-xl text-white shadow-lg">
                 <i data-lucide="activity"></i>
             </div>
-            <h1 class="text-xl font-extrabold tracking-tight text-slate-800">SaludPro <span class="text-indigo-600">V3</span></h1>
+            <h1 class="text-xl font-extrabold tracking-tight text-slate-800">SaludPro <span class="text-indigo-600">V9</span></h1>
         </div>
-        <button onclick="toggleModal(true)" class="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold text-xs shadow-md active:scale-95 transition-all">
-            <i data-lucide="share-2" class="w-4 h-4"></i>
-            Exportar
+        <button onclick="toggleModal(true)" class="p-2 text-indigo-600 bg-white/50 rounded-xl active:scale-95 transition-all border border-indigo-100">
+            <i data-lucide="share-2" class="w-5 h-5"></i>
         </button>
     </header>
 
-    <!-- MODAL DE EXPORTACIÓN -->
+    <!-- Modal Exportación -->
     <div id="exportModal" class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm items-end sm:items-center justify-center p-4">
         <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom duration-300">
-            <div class="p-6 text-center border-b border-slate-100">
-                <h3 class="text-lg font-bold">Exportar Reporte</h3>
-                <p class="text-xs text-slate-500 mt-1">Selecciona cómo deseas recibir tus datos</p>
+            <div class="p-6 text-center border-b">
+                <h3 class="font-bold">Exportar Reporte</h3>
+                <p class="text-[10px] text-slate-400 mt-1 uppercase font-bold tracking-widest">Registros de Salud</p>
             </div>
             <div class="p-4 space-y-3">
-                <button onclick="handleExport('download')" class="w-full flex items-center gap-4 p-4 hover:bg-slate-50 rounded-2xl transition-colors border border-slate-100">
-                    <div class="bg-blue-100 p-2 rounded-xl text-blue-600"><i data-lucide="download"></i></div>
-                    <div class="text-left"><p class="font-bold text-sm">Descargar Archivo</p><p class="text-[10px] text-slate-400">Guardar CSV en el dispositivo</p></div>
+                <button onclick="handleExport('download')" class="w-full flex items-center gap-4 p-4 hover:bg-slate-50 rounded-2xl border border-slate-100">
+                    <i data-lucide="download" class="text-blue-600"></i>
+                    <div class="text-left"><p class="font-bold text-sm">Descargar CSV</p><p class="text-[10px] text-slate-400">Archivo para Excel</p></div>
                 </button>
-                <button onclick="handleExport('whatsapp')" class="w-full flex items-center gap-4 p-4 hover:bg-slate-50 rounded-2xl transition-colors border border-slate-100">
-                    <div class="bg-emerald-100 p-2 rounded-xl text-emerald-600"><i data-lucide="message-circle"></i></div>
-                    <div class="text-left"><p class="font-bold text-sm">WhatsApp</p><p class="text-[10px] text-slate-400">Enviar resumen y archivo</p></div>
+                <button onclick="handleExport('whatsapp')" class="w-full flex items-center gap-4 p-4 hover:bg-slate-50 rounded-2xl border border-slate-100">
+                    <i data-lucide="message-circle" class="text-emerald-500"></i>
+                    <div class="text-left"><p class="font-bold text-sm">WhatsApp</p><p class="text-[10px] text-slate-400">Enviar por chat</p></div>
                 </button>
-                <button onclick="handleExport('email')" class="w-full flex items-center gap-4 p-4 hover:bg-slate-50 rounded-2xl transition-colors border border-slate-100">
-                    <div class="bg-indigo-100 p-2 rounded-xl text-indigo-600"><i data-lucide="mail"></i></div>
-                    <div class="text-left"><p class="font-bold text-sm">Correo Electrónico</p><p class="text-[10px] text-slate-400">Enviar reporte detallado</p></div>
+                <button onclick="handleExport('email')" class="w-full flex items-center gap-4 p-4 hover:bg-slate-50 rounded-2xl border border-slate-100">
+                    <i data-lucide="mail" class="text-indigo-600"></i>
+                    <div class="text-left"><p class="font-bold text-sm">Correo</p><p class="text-[10px] text-slate-400">Enviar adjunto</p></div>
                 </button>
             </div>
-            <button onclick="toggleModal(false)" class="w-full py-4 text-slate-400 text-xs font-bold uppercase tracking-widest border-t">Cancelar</button>
+            <button onclick="toggleModal(false)" class="w-full py-4 text-slate-400 text-xs font-bold border-t">CERRAR</button>
         </div>
     </div>
 
     <main class="max-w-xl mx-auto p-4">
         
-        <!-- PESTAÑA: INICIO -->
+        <!-- 1. INICIO -->
         <section id="tab-home" class="tab-content active space-y-6">
-            <div class="grid grid-cols-2 gap-4">
-                <div class="bg-white p-5 rounded-3xl border shadow-sm border-rose-100">
-                    <div class="flex justify-between items-start mb-2">
-                        <i data-lucide="heart" class="text-rose-500 w-5 h-5"></i>
-                        <span class="text-[9px] font-black text-slate-400 uppercase">Promedio Total</span>
-                    </div>
-                    <div id="avg-pressure" class="text-2xl font-extrabold tracking-tighter">--/--</div>
-                    <div class="text-[10px] text-slate-400 font-bold uppercase">mmHg</div>
+            <div class="grid grid-cols-3 gap-3">
+                <div class="glass-panel p-4 rounded-3xl border border-rose-100 flex flex-col items-center text-center shadow-sm">
+                    <i data-lucide="heart" class="text-rose-500 w-4 h-4 mb-1"></i>
+                    <div id="avg-pressure" class="text-base font-black">--/--</div>
+                    <span class="text-[7px] font-black text-slate-400 uppercase">Presión</span>
                 </div>
-                <div class="bg-white p-5 rounded-3xl border shadow-sm border-blue-100">
-                    <div class="flex justify-between items-start mb-2">
-                        <i data-lucide="droplet" class="text-blue-500 w-5 h-5"></i>
-                        <span class="text-[9px] font-black text-slate-400 uppercase">Promedio Total</span>
-                    </div>
-                    <div id="avg-glucose" class="text-2xl font-extrabold tracking-tighter">--</div>
-                    <div class="text-[10px] text-slate-400 font-bold uppercase">mg/dL</div>
+                <div class="glass-panel p-4 rounded-3xl border border-blue-100 flex flex-col items-center text-center shadow-sm">
+                    <i data-lucide="droplet" class="text-blue-500 w-4 h-4 mb-1"></i>
+                    <div id="avg-glucose" class="text-base font-black">--</div>
+                    <span class="text-[7px] font-black text-slate-400 uppercase">Glucosa</span>
+                </div>
+                <div class="glass-panel p-4 rounded-3xl border border-emerald-100 flex flex-col items-center text-center shadow-sm">
+                    <i data-lucide="zap" class="text-emerald-500 w-4 h-4 mb-1"></i>
+                    <div id="avg-hr" class="text-base font-black">--</div>
+                    <span class="text-[7px] font-black text-slate-400 uppercase">Latidos</span>
                 </div>
             </div>
-
-            <div class="space-y-3">
-                <h3 class="text-sm font-bold px-2 text-slate-500 flex items-center gap-2">
-                    <i data-lucide="history" class="w-4 h-4"></i> Registros Recientes
-                </h3>
-                <div id="recent-list" class="space-y-3"></div>
+            <div class="space-y-4">
+                <h3 class="text-[10px] font-black text-slate-500 bg-white/50 w-fit px-2 py-1 rounded-lg backdrop-blur-sm uppercase tracking-widest">Actividad Reciente</h3>
+                <div id="home-combined-list" class="space-y-3"></div>
             </div>
         </section>
 
-        <!-- PESTAÑA: GRÁFICAS -->
+        <!-- 2. REPORTE -->
+        <section id="tab-report" class="tab-content space-y-4">
+            <div class="flex gap-4 border-b mb-6 glass-panel rounded-2xl sticky top-[72px] z-10 p-2 shadow-sm">
+                <button onclick="setReportSubTab('metrics')" id="subtab-rep-metrics" class="flex-1 pb-2 text-sm font-bold sub-tab-active">Signos Vitales</button>
+                <button onclick="setReportSubTab('meds')" id="subtab-rep-meds" class="flex-1 pb-2 text-sm font-bold text-slate-400">Medicamentos</button>
+            </div>
+            <div id="report-list" class="space-y-3 pb-8"></div>
+        </section>
+
+        <!-- 3. GRÁFICA -->
         <section id="tab-charts" class="tab-content space-y-6">
-            <div class="bg-white p-6 rounded-3xl border shadow-sm">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-lg font-bold">Tendencias</h2>
-                    <div class="flex bg-slate-100 p-1 rounded-xl text-[10px] font-black uppercase">
-                        <button onclick="updateChartPeriod('daily')" id="btn-chart-daily" class="px-3 py-1.5 rounded-lg active-filter">Día</button>
-                        <button onclick="updateChartPeriod('weekly')" id="btn-chart-weekly" class="px-3 py-1.5 rounded-lg text-slate-500">Semana</button>
-                        <button onclick="updateChartPeriod('monthly')" id="btn-chart-monthly" class="px-3 py-1.5 rounded-lg text-slate-500">Mes</button>
+            <div class="glass-panel p-6 rounded-3xl shadow-sm">
+                <div class="flex flex-col gap-5 mb-6">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-lg font-bold">Tendencias</h2>
+                        <div class="flex bg-slate-200/50 p-1 rounded-xl text-[10px] font-extrabold border">
+                            <button onclick="updateChartPeriod('daily')" id="btn-chart-daily" class="px-3 py-1.5 rounded-lg active-filter transition-all">Día</button>
+                            <button onclick="updateChartPeriod('weekly')" id="btn-chart-weekly" class="px-3 py-1.5 rounded-lg text-slate-500 transition-all">Sem</button>
+                            <button onclick="updateChartPeriod('monthly')" id="btn-chart-monthly" class="px-3 py-1.5 rounded-lg text-slate-500 transition-all">Mes</button>
+                        </div>
+                    </div>
+                    <div class="flex gap-4 justify-center bg-white/50 p-2 rounded-2xl text-[9px] font-black uppercase border border-white/50">
+                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-rose-500"></span> Sistólica</span>
+                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-orange-400"></span> Diastólica</span>
+                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Latidos</span>
                     </div>
                 </div>
                 <div class="chart-container"><canvas id="detailedChart"></canvas></div>
-                <div class="mt-6 grid grid-cols-2 gap-4 border-t pt-4">
-                    <div class="text-center">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase">Máximo</p>
-                        <p id="chart-max" class="text-lg font-black text-rose-500">--</p>
-                    </div>
-                    <div class="text-center border-l">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase">Mínimo</p>
-                        <p id="chart-min" class="text-lg font-black text-indigo-500">--</p>
-                    </div>
-                </div>
+            </div>
+            <div class="bg-indigo-900/90 backdrop-blur-md text-white p-6 rounded-3xl shadow-xl shadow-indigo-100/50">
+                <h4 class="text-xs font-bold uppercase tracking-widest opacity-60 mb-2">Análisis</h4>
+                <p id="chart-summary-text" class="text-sm font-medium leading-relaxed">No hay suficientes datos para el análisis.</p>
             </div>
         </section>
 
-        <!-- PESTAÑA: AÑADIR -->
+        <!-- 4. INGRESAR -->
         <section id="tab-add" class="tab-content space-y-6">
-            <div class="bg-white p-6 rounded-3xl border shadow-sm">
-                <h2 class="text-xl font-bold mb-6">Nuevo Registro</h2>
-                <div class="space-y-5">
-                    <div class="grid grid-cols-2 gap-4">
-                        <input type="date" id="in-date" class="p-4 bg-slate-50 border rounded-2xl font-bold outline-none">
-                        <input type="time" id="in-time" class="p-4 bg-slate-50 border rounded-2xl font-bold outline-none">
-                    </div>
-                    <div class="p-5 bg-rose-50 rounded-3xl border border-rose-100 space-y-4">
-                        <label class="text-xs font-bold text-rose-600 uppercase flex items-center gap-2">
-                            <i data-lucide="heart" class="w-4 h-4"></i> Presión (mmHg)
-                        </label>
-                        <div class="grid grid-cols-2 gap-4">
-                            <input type="number" id="in-sys" placeholder="SIS" class="p-4 border rounded-2xl font-bold text-center outline-none">
-                            <input type="number" id="in-dia" placeholder="DIA" class="p-4 border rounded-2xl font-bold text-center outline-none">
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="p-4 bg-blue-50 rounded-3xl border border-blue-100 space-y-2">
-                            <label class="text-xs font-bold text-blue-600 uppercase">Glucosa</label>
-                            <input type="number" id="in-gluc" placeholder="mg/dL" class="w-full p-4 border rounded-2xl font-bold text-center outline-none">
-                        </div>
-                        <div class="p-4 bg-emerald-50 rounded-3xl border border-emerald-100 space-y-2">
-                            <label class="text-xs font-bold text-emerald-600 uppercase">Ritmo</label>
-                            <input type="number" id="in-hr" placeholder="BPM" class="w-full p-4 border rounded-2xl font-bold text-center outline-none">
-                        </div>
-                    </div>
-                    <div class="p-4 bg-slate-50 rounded-3xl border space-y-3">
-                        <label class="text-xs font-bold text-slate-600 uppercase">Medicina</label>
-                        <input type="text" id="in-med" placeholder="Medicamento y dosis" class="w-full p-4 border rounded-2xl text-sm outline-none">
-                    </div>
-                    <button onclick="saveRecord()" class="w-full py-5 bg-indigo-600 text-white rounded-3xl font-black shadow-lg shadow-indigo-100 active:scale-95 transition-all">
-                        GUARDAR DATOS
-                    </button>
-                </div>
+            <div class="flex glass-panel p-1 rounded-2xl shadow-sm mb-4 border-slate-100">
+                <button onclick="setAddSubTab('metrics')" id="subtab-add-metrics" class="flex-1 py-3 text-xs font-black uppercase rounded-xl sub-tab-active bg-indigo-50/80 text-indigo-700 transition-all">Signos Vitales</button>
+                <button onclick="setAddSubTab('meds')" id="subtab-add-meds" class="flex-1 py-3 text-xs font-black uppercase rounded-xl text-slate-400 transition-all">Medicamentos</button>
             </div>
-        </section>
 
-        <!-- PESTAÑA: REPORTE -->
-        <section id="tab-report" class="tab-content space-y-4">
-            <div class="flex justify-between items-center px-2">
-                <h2 class="text-xl font-bold">Historial</h2>
-                <div id="record-count" class="text-[10px] font-black text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100 uppercase tracking-widest">0 Entradas</div>
+            <div id="form-metrics" class="space-y-5 animate-in fade-in zoom-in-95 duration-300">
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="date" id="in-date" class="p-4 bg-white/90 border rounded-2xl font-bold text-sm outline-none shadow-sm focus:ring-2 ring-indigo-200">
+                    <input type="time" id="in-time" class="p-4 bg-white/90 border rounded-2xl font-bold text-sm outline-none shadow-sm focus:ring-2 ring-indigo-200">
+                </div>
+                <div class="p-5 bg-rose-50/80 backdrop-blur-sm rounded-3xl border border-rose-100 space-y-4 shadow-sm">
+                    <label class="text-[10px] font-black text-rose-600 uppercase flex items-center gap-2"><i data-lucide="heart" class="w-3 h-3"></i> Presión (mmHg)</label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <input type="number" id="in-sys" placeholder="SIST" class="p-4 border rounded-2xl font-bold text-center bg-white outline-none">
+                        <input type="number" id="in-dia" placeholder="DIAST" class="p-4 border rounded-2xl font-bold text-center bg-white outline-none">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="p-4 bg-blue-50/80 backdrop-blur-sm rounded-3xl border border-blue-100 space-y-2 text-center shadow-sm">
+                        <label class="text-[10px] font-black text-blue-600 uppercase">Glucosa</label>
+                        <input type="number" id="in-gluc" placeholder="mg/dL" class="w-full p-4 border rounded-2xl font-bold text-center bg-white outline-none">
+                    </div>
+                    <div class="p-4 bg-emerald-50/80 backdrop-blur-sm rounded-3xl border border-emerald-100 space-y-2 text-center shadow-sm">
+                        <label class="text-[10px] font-black text-emerald-600 uppercase">Latidos</label>
+                        <input type="number" id="in-hr" placeholder="BPM" class="w-full p-4 border rounded-2xl font-bold text-center bg-white outline-none">
+                    </div>
+                </div>
+                <button onclick="saveMetric()" class="w-full py-5 bg-indigo-600 text-white rounded-3xl font-black shadow-lg shadow-indigo-100 active:scale-95 transition-all text-lg">GUARDAR</button>
             </div>
-            <div id="full-history-list" class="space-y-3"></div>
+
+            <div id="form-meds" class="hidden space-y-5 animate-in fade-in duration-300">
+                <div class="bg-indigo-50/80 backdrop-blur-sm p-6 rounded-3xl border border-indigo-100 space-y-4 shadow-sm">
+                    <label class="text-[10px] font-black text-indigo-600 uppercase flex items-center gap-2"><i data-lucide="pill" class="w-4 h-4"></i> Medicamento</label>
+                    <input type="text" id="in-med-name" placeholder="Ej. Telmisartán" class="w-full p-4 border rounded-2xl font-bold outline-none bg-white">
+                    <input type="text" id="in-med-qty" placeholder="Ej. 1 tableta" class="w-full p-4 border rounded-2xl font-medium outline-none bg-white">
+                    <div class="grid grid-cols-2 gap-4">
+                        <input type="date" id="in-med-date" class="p-4 bg-white border rounded-2xl font-bold text-sm outline-none">
+                        <input type="time" id="in-med-time" class="p-4 bg-white border rounded-2xl font-bold text-sm outline-none">
+                    </div>
+                </div>
+                <button onclick="saveMedication()" class="w-full py-5 bg-emerald-600 text-white rounded-3xl font-black shadow-lg active:scale-95 transition-all text-lg">REGISTRAR TOMA</button>
+            </div>
         </section>
 
     </main>
 
-    <!-- Barra de Navegación -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t px-8 py-5 flex justify-between items-center z-50 shadow-2xl safe-bottom">
-        <button onclick="switchTab('home')" class="nav-btn flex flex-col items-center gap-1 text-indigo-600" data-tab="home">
-            <i data-lucide="home"></i>
-            <span class="text-[9px] font-black uppercase">Inicio</span>
+    <!-- NAVEGACIÓN INFERIOR -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/70 backdrop-blur-xl border-t px-4 py-3 flex justify-between items-end z-50 safe-bottom shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
+        <button onclick="switchTab('home')" class="nav-btn flex-1 flex flex-col items-center gap-1 p-2 text-indigo-600" data-tab="home">
+            <i data-lucide="home" class="w-6 h-6"></i>
+            <span class="text-[10px] font-bold uppercase tracking-tight">Inicio</span>
         </button>
-        <button onclick="switchTab('charts')" class="nav-btn flex flex-col items-center gap-1 text-slate-400" data-tab="charts">
-            <i data-lucide="bar-chart-2"></i>
-            <span class="text-[9px] font-black uppercase">Gráficas</span>
+        <button onclick="switchTab('report')" class="nav-btn flex-1 flex flex-col items-center gap-1 p-2 text-slate-400" data-tab="report">
+            <i data-lucide="clipboard-list" class="w-6 h-6"></i>
+            <span class="text-[10px] font-bold uppercase tracking-tight">Reporte</span>
         </button>
-        <button onclick="switchTab('add')" class="nav-btn flex flex-col items-center gap-1 text-slate-400" data-tab="add">
-            <div class="bg-indigo-600 p-3 rounded-2xl -mt-12 shadow-xl border-4 border-white text-white">
-                <i data-lucide="plus"></i>
-            </div>
-            <span class="text-[9px] font-black uppercase mt-1">Añadir</span>
+        <button onclick="switchTab('charts')" class="nav-btn flex-1 flex flex-col items-center gap-1 p-2 text-slate-400" data-tab="charts">
+            <i data-lucide="bar-chart-2" class="w-6 h-6"></i>
+            <span class="text-[10px] font-bold uppercase tracking-tight">Gráfica</span>
         </button>
-        <button onclick="switchTab('report')" class="nav-btn flex flex-col items-center gap-1 text-slate-400" data-tab="report">
-            <i data-lucide="clipboard-list"></i>
-            <span class="text-[9px] font-black uppercase">Reporte</span>
+        <button onclick="switchTab('add')" class="nav-btn flex-1 flex flex-col items-center gap-1 p-2 text-slate-400" data-tab="add">
+            <i data-lucide="plus-circle" class="w-7 h-7"></i>
+            <span class="text-[10px] font-bold uppercase tracking-tight">Ingresar</span>
         </button>
     </nav>
 
     <script>
-        let healthData = JSON.parse(localStorage.getItem('salud_v3_data')) || [];
+        // Lógica de datos
+        let healthData = JSON.parse(localStorage.getItem('salud_v9_metrics')) || [];
+        let medsData = JSON.parse(localStorage.getItem('salud_v9_meds')) || [];
+        
         let chartInstance = null;
         let currentChartPeriod = 'daily';
+        let activeAddSubTab = 'metrics';
+        let activeReportSubTab = 'metrics';
 
         function init() {
             lucide.createIcons();
@@ -201,197 +243,232 @@
         }
 
         function setInputsDefault() {
-            document.getElementById('in-date').value = new Date().toISOString().split('T')[0];
-            document.getElementById('in-time').value = new Date().toLocaleTimeString('en-GB', {hour: '2-digit', minute:'2-digit'});
+            const d = new Date().toISOString().split('T')[0];
+            const t = new Date().toLocaleTimeString('en-GB', {hour: '2-digit', minute:'2-digit'});
+            document.getElementById('in-date').value = d;
+            document.getElementById('in-time').value = t;
+            document.getElementById('in-med-date').value = d;
+            document.getElementById('in-med-time').value = t;
         }
 
-        function toggleModal(show) {
-            const modal = document.getElementById('exportModal');
-            if (show) modal.classList.add('active');
-            else modal.classList.remove('active');
-        }
+        function toggleModal(s) { document.getElementById('exportModal').classList.toggle('active', s); }
 
-        function switchTab(tabId) {
+        function switchTab(id) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(b => {
-                b.classList.replace('text-indigo-600', 'text-slate-400');
+                b.classList.remove('text-indigo-600');
+                b.classList.add('text-slate-400');
             });
-
-            document.getElementById(`tab-${tabId}`).classList.add('active');
-            const btn = document.querySelector(`[data-tab="${tabId}"]`);
-            if(btn) btn.classList.replace('text-slate-400', 'text-indigo-600');
-
-            if(tabId === 'charts') renderDetailedChart();
+            document.getElementById(`tab-${id}`).classList.add('active');
+            const btn = document.querySelector(`[data-tab="${id}"]`);
+            if(btn) {
+                btn.classList.remove('text-slate-400');
+                btn.classList.add('text-indigo-600');
+            }
+            if(id === 'charts') setTimeout(renderDetailedChart, 100);
+            updateAll();
             lucide.createIcons();
         }
 
-        function saveRecord() {
+        function setAddSubTab(id) {
+            activeAddSubTab = id;
+            const btnMetrics = document.getElementById('subtab-add-metrics');
+            const btnMeds = document.getElementById('subtab-add-meds');
+            if(id === 'metrics') {
+                btnMetrics.classList.add('sub-tab-active', 'bg-indigo-50/80', 'text-indigo-700');
+                btnMetrics.classList.remove('text-slate-400');
+                btnMeds.classList.remove('sub-tab-active', 'bg-indigo-50/80', 'text-indigo-700');
+                btnMeds.classList.add('text-slate-400');
+            } else {
+                btnMeds.classList.add('sub-tab-active', 'bg-indigo-50/80', 'text-indigo-700');
+                btnMeds.classList.remove('text-slate-400');
+                btnMetrics.classList.remove('sub-tab-active', 'bg-indigo-50/80', 'text-indigo-700');
+                btnMetrics.classList.add('text-slate-400');
+            }
+            document.getElementById('form-metrics').classList.toggle('hidden', id === 'meds');
+            document.getElementById('form-meds').classList.toggle('hidden', id === 'metrics');
+            lucide.createIcons();
+        }
+
+        function setReportSubTab(id) {
+            activeReportSubTab = id;
+            document.getElementById('subtab-rep-metrics').classList.toggle('sub-tab-active', id === 'metrics');
+            document.getElementById('subtab-rep-metrics').classList.toggle('text-slate-400', id !== 'metrics');
+            document.getElementById('subtab-rep-meds').classList.toggle('sub-tab-active', id === 'meds');
+            document.getElementById('subtab-rep-meds').classList.toggle('text-slate-400', id !== 'meds');
+            updateAll();
+        }
+
+        function saveMetric() {
             const entry = {
                 id: Date.now(),
+                type: 'metric',
                 timestamp: new Date(document.getElementById('in-date').value + 'T' + document.getElementById('in-time').value).getTime(),
                 fecha: document.getElementById('in-date').value,
                 hora: document.getElementById('in-time').value,
                 sys: Number(document.getElementById('in-sys').value) || null,
                 dia: Number(document.getElementById('in-dia').value) || null,
                 gluc: Number(document.getElementById('in-gluc').value) || null,
-                hr: Number(document.getElementById('in-hr').value) || null,
-                med: document.getElementById('in-med').value
+                hr: Number(document.getElementById('in-hr').value) || null
             };
-            if(!entry.sys && !entry.gluc) return alert("Ingresa datos");
+            if(!entry.sys && !entry.gluc && !entry.hr) return alert("Ingresa algún dato");
             healthData.unshift(entry);
-            healthData.sort((a,b) => b.timestamp - a.timestamp);
-            localStorage.setItem('salud_v3_data', JSON.stringify(healthData));
-            ['in-sys','in-dia','in-gluc','in-hr','in-med'].forEach(id => document.getElementById(id).value = '');
+            localStorage.setItem('salud_v9_metrics', JSON.stringify(healthData));
+            ['in-sys','in-dia','in-gluc','in-hr'].forEach(i => document.getElementById(i).value = '');
             updateAll();
             switchTab('home');
         }
 
-        function deleteRecord(id) {
-            if(confirm("¿Eliminar registro?")) {
+        function saveMedication() {
+            const name = document.getElementById('in-med-name').value;
+            if(!name) return alert("Ingresa nombre");
+            const entry = {
+                id: Date.now(),
+                type: 'med',
+                timestamp: new Date(document.getElementById('in-med-date').value + 'T' + document.getElementById('in-med-time').value).getTime(),
+                fecha: document.getElementById('in-med-date').value,
+                hora: document.getElementById('in-med-time').value,
+                name: name,
+                qty: document.getElementById('in-med-qty').value
+            };
+            medsData.unshift(entry);
+            localStorage.setItem('salud_v9_meds', JSON.stringify(medsData));
+            document.getElementById('in-med-name').value = '';
+            document.getElementById('in-med-qty').value = '';
+            updateAll();
+            switchTab('home');
+        }
+
+        function deleteRecord(id, type) {
+            if(!confirm("¿Eliminar?")) return;
+            if(type === 'metric') {
                 healthData = healthData.filter(d => d.id !== id);
-                localStorage.setItem('salud_v3_data', JSON.stringify(healthData));
-                updateAll();
+                localStorage.setItem('salud_v9_metrics', JSON.stringify(healthData));
+            } else {
+                medsData = medsData.filter(d => d.id !== id);
+                localStorage.setItem('salud_v9_meds', JSON.stringify(medsData));
             }
+            updateAll();
         }
 
         function updateAll() {
-            const hasSys = healthData.filter(d => d.sys);
-            const hasGluc = healthData.filter(d => d.gluc);
-            if(hasSys.length) {
-                const s = (hasSys.reduce((a,b) => a + b.sys, 0) / hasSys.length).toFixed(0);
-                const d = (hasSys.reduce((a,b) => a + b.dia, 0) / hasSys.length).toFixed(0);
+            const hSys = healthData.filter(d => d.sys);
+            const hGluc = healthData.filter(d => d.gluc);
+            const hHr = healthData.filter(d => d.hr);
+            if(hSys.length) {
+                const s = (hSys.reduce((a,b)=>a+b.sys,0)/hSys.length).toFixed(0);
+                const d = (hSys.reduce((a,b)=>a+b.dia,0)/hSys.length).toFixed(0);
                 document.getElementById('avg-pressure').innerText = `${s}/${d}`;
             }
-            if(hasGluc.length) {
-                document.getElementById('avg-glucose').innerText = (hasGluc.reduce((a,b) => a + b.gluc, 0) / hasGluc.length).toFixed(1);
-            }
-            document.getElementById('recent-list').innerHTML = healthData.slice(0, 4).map(d => renderCard(d)).join('');
-            document.getElementById('full-history-list').innerHTML = healthData.map(d => renderCard(d, true)).join('');
-            document.getElementById('record-count').innerText = `${healthData.length} Entradas`;
-            if(document.getElementById('tab-charts').classList.contains('active')) renderDetailedChart();
+            if(hGluc.length) document.getElementById('avg-glucose').innerText = (hGluc.reduce((a,b)=>a+b.gluc,0)/hGluc.length).toFixed(0);
+            if(hHr.length) document.getElementById('avg-hr').innerText = (hHr.reduce((a,b)=>a+b.hr,0)/hHr.length).toFixed(0);
+            const combined = [...healthData, ...medsData].sort((a,b) => b.timestamp - a.timestamp).slice(0, 5);
+            document.getElementById('home-combined-list').innerHTML = combined.map(d => renderCard(d)).join('');
+            const targetList = activeReportSubTab === 'metrics' ? healthData : medsData;
+            document.getElementById('report-list').innerHTML = targetList.map(d => renderCard(d, true)).join('');
             lucide.createIcons();
         }
 
         function renderCard(d, del = false) {
+            const isMed = d.type === 'med';
             return `
-                <div class="p-4 rounded-2xl border bg-white shadow-sm flex items-center gap-4">
-                    <div class="text-center min-w-[50px] border-r pr-3 border-slate-100">
-                        <p class="text-[9px] font-black text-slate-400 uppercase">${d.fecha.split('-').slice(1).reverse().join('/')}</p>
-                        <p class="text-xs font-bold">${d.hora}</p>
+                <div class="glass-panel p-4 rounded-3xl border flex items-center gap-4 ${isMed ? 'border-indigo-100 shadow-indigo-100/10' : 'border-slate-100 shadow-slate-100/10'}">
+                    <div class="text-center min-w-[50px] border-r pr-3 border-slate-200">
+                        <p class="text-[8px] font-black text-slate-500 uppercase">${d.fecha.split('-').slice(1).reverse().join('/')}</p>
+                        <p class="text-[10px] font-bold text-slate-700">${d.hora}</p>
                     </div>
                     <div class="flex-1">
-                        <div class="flex items-center gap-2">
-                            ${d.sys ? `<span class="font-black">${d.sys}/${d.dia}</span>` : ''}
-                            ${d.gluc ? `<span class="text-blue-600 font-bold ml-1">G: ${d.gluc}</span>` : ''}
-                        </div>
-                        <p class="text-[10px] text-slate-500">${d.med || 'Sin medicamento'}</p>
+                        ${isMed ? `
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="pill" class="w-3 h-3 text-indigo-500"></i>
+                                <span class="font-bold text-sm text-indigo-900">${d.name}</span>
+                            </div>
+                            <p class="text-[9px] text-slate-500 font-bold uppercase">${d.qty || 'Dosis'}</p>
+                        ` : `
+                            <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+                                ${d.sys ? `<span class="font-black text-slate-800 text-sm">${d.sys}/${d.dia}</span>` : ''}
+                                ${d.hr ? `<span class="text-emerald-600 font-bold text-sm flex items-center gap-1"><i data-lucide="zap" class="w-2 h-2"></i>${d.hr}</span>` : ''}
+                                ${d.gluc ? `<span class="text-blue-600 font-bold text-sm">G:${d.gluc}</span>` : ''}
+                            </div>
+                        `}
                     </div>
-                    ${del ? `<button onclick="deleteRecord(${d.id})" class="text-slate-300 hover:text-rose-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}
+                    ${del ? `<button onclick="deleteRecord(${d.id}, '${d.type}')" class="text-slate-300 hover:text-rose-500 transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}
                 </div>`;
         }
 
         function updateChartPeriod(p) {
             currentChartPeriod = p;
-            ['daily', 'weekly', 'monthly'].forEach(x => {
-                document.getElementById(`btn-chart-${x}`).classList.toggle('active-filter', x === p);
-                document.getElementById(`btn-chart-${x}`).classList.toggle('text-slate-500', x !== p);
+            ['daily','weekly','monthly'].forEach(x => {
+                const btn = document.getElementById(`btn-chart-${x}`);
+                btn.classList.toggle('active-filter', x === p);
+                btn.classList.toggle('text-slate-500', x !== p);
             });
             renderDetailedChart();
         }
 
         function renderDetailedChart() {
-            const ctx = document.getElementById('detailedChart').getContext('2d');
+            const ctx = document.getElementById('detailedChart')?.getContext('2d');
+            if(!ctx) return;
             let filtered = [...healthData].reverse();
             const now = Date.now();
             const ms = { daily: 86400000, weekly: 604800000, monthly: 2592000000 };
             filtered = filtered.filter(d => (now - d.timestamp) <= ms[currentChartPeriod]);
             if(chartInstance) chartInstance.destroy();
+            let labels = filtered.map(d => currentChartPeriod === 'daily' ? d.hora : d.fecha.split('-').reverse().slice(0,2).join('/'));
             chartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: filtered.map(d => currentChartPeriod === 'daily' ? d.hora : d.fecha.split('-').reverse().slice(0,2).join('/')),
+                    labels: labels,
                     datasets: [
-                        { label: 'Sistólica', data: filtered.map(d => d.sys), borderColor: '#f43f5e', tension: 0.4 },
-                        { label: 'Glucosa', data: filtered.map(d => d.gluc), borderColor: '#3b82f6', tension: 0.4, borderDash: [5,5] }
+                        { label: 'Sis', data: filtered.map(d => d.sys), borderColor: '#f43f5e', backgroundColor:'rgba(244,63,94,0.05)', tension:0.4, pointRadius:3, fill:true },
+                        { label: 'Dia', data: filtered.map(d => d.dia), borderColor: '#fb923c', tension:0.4, pointRadius:3 },
+                        { label: 'BPM', data: filtered.map(d => d.hr), borderColor: '#10b981', tension:0.4, pointRadius:3, borderDash:[2,2] }
                     ]
                 },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { legend: {display:false} },
+                    scales: {
+                        x: { grid:{display:false}, ticks:{font:{size:9, weight: 'bold'}, color:'#475569'} },
+                        y: { grid:{color:'rgba(226, 232, 240, 0.5)'}, ticks:{font:{size:9, weight: 'bold'}, color:'#475569'} }
+                    }
+                }
             });
-            const v = filtered.flatMap(d => [d.sys, d.gluc].filter(x => x));
-            if(v.length) {
-                document.getElementById('chart-max').innerText = Math.max(...v);
-                document.getElementById('chart-min').innerText = Math.min(...v);
+            const summary = document.getElementById('chart-summary-text');
+            if(filtered.length > 0) {
+                const avgSys = (filtered.filter(d => d.sys).reduce((a,b)=>a+b.sys,0)/filtered.filter(d=>d.sys).length || 0).toFixed(0);
+                summary.innerText = `Presión Sistólica Media: ${avgSys} mmHg en este periodo.`;
+            } else {
+                summary.innerText = "Registra datos para generar el análisis.";
             }
         }
 
-        // --- SISTEMA DE EXPORTACIÓN AVANZADO ---
-        async function handleExport(type) {
+        function handleExport(type) {
             toggleModal(false);
-            if (!healthData.length) return alert("Sin datos");
+            let csv = "\uFEFFMÉTRICAS\nFecha,Hora,Sistolica,Diastolica,Glucosa,Latidos\n";
+            healthData.forEach(d => csv += `${d.fecha},${d.hora},${d.sys||''},${d.dia||''},${d.gluc||''},${d.hr||''}\n`);
+            csv += "\nMEDICAMENTOS\nFecha,Hora,Nombre,Dosis\n";
+            medsData.forEach(d => csv += `${d.fecha},${d.hora},"${d.name}","${d.qty||''}"\n`);
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const fileName = `SaludPro_Reporte.csv`;
 
-            const csv = generateCSV();
-            const fileName = `SaludPro_Reporte_${new Date().toISOString().split('T')[0]}.csv`;
-            const summaryText = `Resumen SaludPro:\nPresión Promedio: ${document.getElementById('avg-pressure').innerText}\nGlucosa Promedio: ${document.getElementById('avg-glucose').innerText}\nRegistros totales: ${healthData.length}`;
-
-            if (type === 'download') {
-                descargarArchivo(csv, fileName);
-            } else if (type === 'whatsapp') {
-                enviarWhatsApp(csv, fileName, summaryText);
+            if(type === 'download') {
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = fileName;
+                a.click();
             } else if (type === 'email') {
-                enviarEmail(csv, fileName, summaryText);
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = fileName;
+                a.click();
+                const body = `Resumen:\nPresión: ${document.getElementById('avg-pressure').innerText}\nGlucosa: ${document.getElementById('avg-glucose').innerText}\n\nAdjunto el reporte descargado.`;
+                window.location.href = `mailto:?subject=Reporte de Salud&body=${encodeURIComponent(body)}`;
+            } else {
+                const text = `SaludPro Resumen:\nPresión: ${document.getElementById('avg-pressure').innerText}\nGlucosa: ${document.getElementById('avg-glucose').innerText}`;
+                window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
             }
-        }
-
-        function generateCSV() {
-            let csv = "\uFEFFFecha,Hora,Sistolica,Diastolica,Glucosa,Ritmo,Medicina\n";
-            healthData.forEach(d => {
-                csv += `${d.fecha},${d.hora},${d.sys || ''},${d.dia || ''},${d.gluc || ''},${d.hr || ''},"${d.med || ''}"\n`;
-            });
-            return csv;
-        }
-
-        function descargarArchivo(content, name) {
-            const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = name;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        async function enviarWhatsApp(content, name, summary) {
-            const shareText = `${summary}\n\nAdjunto envío mi historial detallado.`;
-            
-            // Intento de compartir archivo nativo
-            if (navigator.canShare && navigator.share) {
-                try {
-                    const file = new File([new Blob([content])], name, { type: 'text/csv' });
-                    await navigator.share({ files: [file], title: 'Reporte Salud', text: shareText });
-                    return;
-                } catch(e) {}
-            }
-            
-            // Fallback: Abrir WhatsApp con texto
-            window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
-            descargarArchivo(content, name); // Descarga el archivo para que el usuario pueda adjuntarlo
-        }
-
-        async function enviarEmail(content, name, summary) {
-            const subject = "Mi Reporte de Salud - SaludPro";
-            const body = `${summary}\n\nPor favor revisa el archivo adjunto que se ha descargado en mi dispositivo.`;
-            
-            if (navigator.canShare && navigator.share) {
-                try {
-                    const file = new File([new Blob([content])], name, { type: 'text/csv' });
-                    await navigator.share({ files: [file], title: subject, text: body });
-                    return;
-                } catch(e) {}
-            }
-
-            // Fallback: Mailto
-            window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            descargarArchivo(content, name);
         }
 
         window.onload = init;
